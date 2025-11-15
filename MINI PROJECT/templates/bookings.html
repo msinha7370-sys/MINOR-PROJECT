@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Bookings</h3>
+<form method="post" class="mb-3">
+  <p>Booking as: <strong>{{ session.username }}</strong></p>
+  <div class="row g-2">
+    <div class="col-md-4">
+      <select name="attraction_id" class="form-control">
+        {% for a in attractions %}
+        <option value="{{ a['id'] }}">{{ a['name'] }} ({{ a['crowd'] }}%)</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1"><input type="number" class="form-control" name="seats" value="1" min="1"></div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary me-2">Book</button>
+    </div>
+  </div>
+</form>
+
+{% if session.user_id == 'admin' %}
+<div class="mb-3">
+  <form method="post" action="{{ url_for('clear_all_bookings') }}" style="display: inline;">
+    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Clear all bookings?')">🗑️ Clear All</button>
+  </form>
+</div>
+{% endif %}
+
+<table class="table">
+  <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Attraction</th><th>Seats</th><th>Crowd %</th><th>Time</th><th>Action</th></tr></thead>
+  <tbody>
+    {% for b in bookings %}
+    <tr>
+      <td>{{ b['id'] }}</td>
+      <td>{{ b['name'] }}</td>
+      <td>{{ b['email'] }}</td>
+      <td>{{ b['attraction_name'] }}</td>
+      <td>{{ b['seats'] }}</td>
+      <td>
+        <span class="badge 
+          {% if b['crowd'] >= 80 %}bg-danger
+          {% elif b['crowd'] >= 50 %}bg-warning text-dark
+          {% else %}bg-success
+          {% endif %}
+        ">{{ b['crowd'] }}%</span>
+      </td>
+      <td>{{ b['timestamp'] }}</td>
+      <td>
+        {% if session.user_id == 'admin' %}
+        <form method="post" action="{{ url_for('delete_booking', booking_id=b['id']) }}" style="display: inline;">
+          <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this booking?')">Delete</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% if bookings|length == 0 %}
+<div class="alert alert-info">No bookings yet.</div>
+{% endif %}
+{% endblock %}

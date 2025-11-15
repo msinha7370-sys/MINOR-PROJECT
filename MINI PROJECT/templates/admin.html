@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Admin - Crowd Levels</h3>
+<table class="table">
+  <thead><tr><th>ID</th><th>Name</th><th>Crowd %</th><th>Action</th></tr></thead>
+  <tbody>
+    {% for a in attractions %}
+    <tr>
+      <td>{{ a['id'] }}</td>
+      <td>{{ a['name'] }}</td>
+      <td>{{ a['crowd'] }}</td>
+      <td>
+        <form method="post" class="d-inline">
+          <input type="hidden" name="attraction_id" value="{{ a['id'] }}">
+          <input type="number" name="crowd" min="0" max="100" value="{{ a['crowd'] }}" class="form-control d-inline" style="width:100px;">
+          <button class="btn btn-sm btn-secondary">Update</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

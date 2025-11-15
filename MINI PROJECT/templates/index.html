@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <h3>Attractions</h3>
+    <div class="row">
+      {% for a in attractions %}
+      <div class="col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ a['name'] }}</h5>
+            <p class="card-text">{{ a['description'][:120] }}...</p>
+            <p class="mb-1"><strong>Location:</strong> {{ a['location'] }}</p>
+            <p class="mb-1"><strong>Crowd:</strong> <span id="crowd-{{ a['id'] }}">{{ a['crowd'] }}</span>%</p>
+            <a href="{{ url_for('attraction', aid=a['id']) }}" class="btn btn-sm btn-primary">View</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <h4>Personalize Recommendations</h4>
+    <form method="get" action="{{ url_for('index') }}">
+      <small>Enter preferred tags (comma separated), e.g. nature,food</small>
+      <input class="form-control my-2" name="prefs" placeholder="nature, culture" value="{{ prefs }}">
+      <button class="btn btn-primary btn-sm">Apply</button>
+    </form>
+
+    <h5 class="mt-4">Top Recommendations</h5>
+    <ul class="list-group">
+      {% for r in recommendations %}
+      <li class="list-group-item">
+        <strong>{{ r['name'] }}</strong><br/>
+        <small>{{ r['description'][:80] }}...</small>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="mt-4">
+      <h6>Demo sensor POST</h6>
+      <p>Run:<br/><code>curl -X POST -H "Content-Type: application/json" -d '{"attraction_id":1,"crowd":85}' http://127.0.0.1:5000/api/sensor</code></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

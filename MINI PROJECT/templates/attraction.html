@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h3>{{ a['name'] }}</h3>
+    <p>{{ a['description'] }}</p>
+    <p><strong>Location:</strong> {{ a['location'] }}</p>
+    <p><strong>Tags:</strong> {{ a['tags'] }}</p>
+    <p><strong>Average rating:</strong> {{ a['avg_rating'] }}</p>
+    <p><strong>Entry Price:</strong> ₹{{ "%.2f"|format(a['price']) }}</p>
+    <p><strong>Current crowd:</strong> <span id="crowd-val">{{ a['crowd'] }}</span>%</p>
+
+    {% if session.user_id %}
+    <form method="post" action="{{ url_for('bookings') }}">
+      <p>Booking as: <strong>{{ session.username }}</strong></p>
+      <input type="hidden" name="attraction_id" value="{{ a['id'] }}">
+      <div class="row g-2 align-items-end">
+        <div class="col-auto">
+          <label class="form-label">Seats</label>
+          <input type="number" name="seats" min="1" value="1" class="form-control" />
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-success">Book</button>
+        </div>
+      </div>
+    </form>
+    {% else %}
+    <a href="{{ url_for('login', next=request.path) }}" class="btn btn-success">Login to Book</a>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+const aid = { a['id'] };
+function poll() {
+  $.getJSON("/api/status/" + aid, function(data){
+    if (data && data.crowd !== undefined) {
+      $("#crowd-val").text(data.crowd);
+    }
+  });
+}
+setInterval(poll, 3000); // poll every 3s
+</script>
+{% endblock %}
